@@ -18,38 +18,7 @@ y0(11,1) = 6000; %ligand %100 %1
 speciesNames = {'C8'; 'C8a'; 'C3'; 'C3a'; 'IAP'; 'C3a-IAP';...
     'BAR'; 'C8a-BAR'; 'receptor'; 'complex'; 'ligand'};
 %% Specify the Number of Cells You Want to Simulate
-numCells = 10000; %10000;
-%% - Varying ligand with [receptor] = 100 (Figure 2)
-
-ligand = logspace(2,5,20);
-
-y0(9,1) = 100;
-for i = 1:size(ligand,2)
-    y0(11,1) = ligand(i);
-    [t, dydt_i] = ode15s(@newEISSINGodeModel_,tspan,y0,options,p);
-
-    dydt{i,1} = dydt_i;
-    C3a_cells(:,i) = dydt{i,1}(:,4); %C3a
-    [m,time_i] = max(dydt{i,1}(:,4));
-    max_C3a_low(i,1) = m;
-    time_max_C3a_low(i,1) = time_i;
-end
-
-%% - varying ligand with [receptor] = 100000 (Figure 2)
-
-ligand = logspace(2,5,20);
-
-y0(9,1) = 100000;
-for i = 1:size(ligand,2)
-    y0(11,1) = ligand(i);
-    [t, dydt_i] = ode15s(@newEISSINGodeModel_,tspan,y0,options,p);
-
-    dydt{i,1} = dydt_i;
-    C3a_cells(:,i) = dydt{i,1}(:,4); %C3a
-    [m,time_i] = max(dydt{i,1}(:,4));
-    max_C3a(i,1) = m;
-    time_max_C3a(i,1) = time_i;
-end
+numCells = 10; %10000;
 
 %% Finding Non-Zero Initial Protein Amounts with Uniform Distribution OR Normal Distribution (Supplemental Figures)
 for i=1:numCells %10000 
@@ -150,7 +119,7 @@ for i=1:numCells
     y0(7,1) = findParams(4,i); %BAR
     y0(9,1) = findParams(5,i); %receptor
     y0(11,1) = 6000; %ligand was 100
-    [t, dydt_i] = ode15s(@newEISSINGodeModel_,tspan, y0,options,p);
+    [t, dydt_i] = ode15s(@ApoptosisODEModelPub,tspan, y0,options,p);
     dydt{i,1} = dydt_i;
  
 end
@@ -281,7 +250,7 @@ y0(11,1) = 100;
 for i = 1:size(receptor,2)
 %     disp(i)
     y0(9,1) = receptor(i);
-    [t, dydt] = ode15s(@newEISSINGodeModel_,tspan,y0,options,p);
+    [t, dydt] = ode15s(@ApoptosisODEModelPub,tspan,y0,options,p);
     c = i/size(receptor,2);
 
     plot(t,dydt(:,4), 'color', [c, 0, 1-c], 'LineWidth', 2)
@@ -291,3 +260,35 @@ end
 xlim([0 800]); 
 digits(7);
 legend(num2str(receptor',digits));
+
+%% - Varying ligand with [receptor] = 100 (Figure 2)
+
+ligand = logspace(2,5,20);
+
+y0(9,1) = 100;
+for i = 1:size(ligand,2)
+    y0(11,1) = ligand(i);
+    [t, dydt_i] = ode15s(@ApoptosisODEModelPub,tspan,y0,options,p);
+
+    dydt{i,1} = dydt_i;
+    C3a_cells(:,i) = dydt{i,1}(:,4); %C3a
+    [m,time_i] = max(dydt{i,1}(:,4));
+    max_C3a_low(i,1) = m;
+    time_max_C3a_low(i,1) = time_i;
+end
+
+%% - varying ligand with [receptor] = 100000 (Figure 2)
+
+ligand = logspace(2,5,20);
+
+y0(9,1) = 100000;
+for i = 1:size(ligand,2)
+    y0(11,1) = ligand(i);
+    [t, dydt_i] = ode15s(@ApoptosisODEModelPub,tspan,y0,options,p);
+
+    dydt{i,1} = dydt_i;
+    C3a_cells(:,i) = dydt{i,1}(:,4); %C3a
+    [m,time_i] = max(dydt{i,1}(:,4));
+    max_C3a(i,1) = m;
+    time_max_C3a(i,1) = time_i;
+end
